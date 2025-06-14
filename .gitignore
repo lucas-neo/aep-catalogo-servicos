@@ -1,0 +1,20 @@
+# front-end/node_modules
+front-end/node_modules/
+# front-end/.next
+front-end/.next/
+# front-end/out
+front-end/out/
+# front-end/.env
+front-end/.env
+# front-end/.env.local
+front-end/.env.local
+# front-end/.env.development.local
+front-end/.env.development.local
+# front-end/.env.test.local
+front-end/.env.test.local
+# front-end/.env.production.local
+front-end/.env.production.local
+# front-end/.turbo
+front-end/.turbo/
+# front-end/.vercel
+front-end/.vercel/
