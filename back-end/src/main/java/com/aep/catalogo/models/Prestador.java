@@ -1,6 +1,6 @@
 package com.aep.catalogo.models;
 
-import jakarta.persistence.*;
+import javax.persistence.*;
 import lombok.Data;
 import java.util.List;
 

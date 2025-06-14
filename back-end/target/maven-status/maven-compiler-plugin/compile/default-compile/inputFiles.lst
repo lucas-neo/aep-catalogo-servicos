@@ -1,0 +1,10 @@
+/Users/lucasneo/Public/aep-catalogo-servicos/back-end/src/main/java/com/aep/catalogo/models/User.java
+/Users/lucasneo/Public/aep-catalogo-servicos/back-end/src/main/java/com/aep/catalogo/models/Servico.java
+/Users/lucasneo/Public/aep-catalogo-servicos/back-end/src/main/java/com/aep/catalogo/repositories/PrestadorRepository.java
+/Users/lucasneo/Public/aep-catalogo-servicos/back-end/src/main/java/com/aep/catalogo/repositories/UserRepository.java
+/Users/lucasneo/Public/aep-catalogo-servicos/back-end/src/main/java/com/aep/catalogo/controllers/PrestadorController.java
+/Users/lucasneo/Public/aep-catalogo-servicos/back-end/src/main/java/com/aep/catalogo/controllers/UserController.java
+/Users/lucasneo/Public/aep-catalogo-servicos/back-end/src/main/java/com/aep/catalogo/CatalogoApplication.java
+/Users/lucasneo/Public/aep-catalogo-servicos/back-end/src/main/java/com/aep/catalogo/models/Prestador.java
+/Users/lucasneo/Public/aep-catalogo-servicos/back-end/src/main/java/com/aep/catalogo/controllers/ServicoController.java
+/Users/lucasneo/Public/aep-catalogo-servicos/back-end/src/main/java/com/aep/catalogo/repositories/ServicoRepository.java
