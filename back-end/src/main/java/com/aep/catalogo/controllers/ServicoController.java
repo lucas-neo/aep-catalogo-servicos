@@ -10,7 +10,6 @@ import java.util.List;
 
 @RestController
 @RequestMapping("/api/servicos")
-@CrossOrigin(origins = "http://localhost:3000")
 public class ServicoController {
 
     @Autowired

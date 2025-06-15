@@ -6,11 +6,11 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/users")
-@CrossOrigin(origins = "http://localhost:3000")
 public class UserController {
     
     @Autowired
@@ -30,6 +30,8 @@ public class UserController {
 
     @PostMapping
     public User createUser(@RequestBody User user) {
+        user.setCriadoEm(LocalDateTime.now());
+        user.setAtualizadoEm(LocalDateTime.now());
         return userRepository.save(user);
     }
 
@@ -40,6 +42,11 @@ public class UserController {
                     user.setNome(userDetails.getNome());
                     user.setEmail(userDetails.getEmail());
                     user.setSenha(userDetails.getSenha());
+                    user.setTelefone(userDetails.getTelefone());
+                    user.setTipo(userDetails.getTipo());
+                    user.setAtivo(userDetails.isAtivo());
+                    user.setAtualizadoEm(LocalDateTime.now());
+                    
                     User updatedUser = userRepository.save(user);
                     return ResponseEntity.ok(updatedUser);
                 })

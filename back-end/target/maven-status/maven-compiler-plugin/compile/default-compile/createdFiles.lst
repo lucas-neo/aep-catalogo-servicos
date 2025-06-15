@@ -1,0 +1,17 @@
+com/aep/catalogo/CatalogoApplication.class
+com/aep/catalogo/controllers/UserController.class
+com/aep/catalogo/repositories/PrestadorRepository.class
+com/aep/catalogo/models/enums/TipoUsuario.class
+com/aep/catalogo/models/User.class
+com/aep/catalogo/repositories/UserRepository.class
+com/aep/catalogo/controllers/FileController.class
+com/aep/catalogo/models/Servico.class
+com/aep/catalogo/controllers/PrestadorController.class
+com/aep/catalogo/models/enums/CategoriaPrestador.class
+com/aep/catalogo/models/Prestador.class
+com/aep/catalogo/controllers/ServicoController.class
+com/aep/catalogo/dto/RegisterDTO.class
+com/aep/catalogo/config/CorsConfig.class
+com/aep/catalogo/models/enums/SubcategoriaPrestador.class
+com/aep/catalogo/repositories/ServicoRepository.class
+com/aep/catalogo/controllers/AuthController.class
