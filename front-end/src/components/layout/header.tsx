@@ -3,6 +3,8 @@
 import Link from "next/link";
 
 import { Search, Home, ShoppingBag, Bell, User } from "lucide-react";
+import shortLogo from "@/assets/short-logo.svg"
+import Image from "next/image"
 
 export function Header() {
   return (
@@ -12,7 +14,13 @@ export function Header() {
           
           {/* Logo */}
           <Link href="/" className="text-xl font-bold text-gray-900">
-            Logo
+            <Image 
+            src={shortLogo} 
+            alt="Logo da Plataforma" 
+            width={80} 
+            height={40}
+            className="h-14 w-auto"
+          />
           </Link>
 
           {/* Ícones da direita */}

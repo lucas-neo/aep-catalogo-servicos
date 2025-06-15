@@ -67,6 +67,20 @@ export const prestadoresService = {
       console.error('Erro na busca:', error)
       throw new Error('Falha na busca')
     }
+  },
+
+  // Avaliar prestador
+  async avaliarPrestador(prestadorId: string, nota: number, comentario?: string): Promise<void> {
+    try {
+      await api.post('/avaliacoes', {
+        prestadorId: parseInt(prestadorId),
+        nota,
+        comentario: comentario || ''
+      })
+    } catch (error) {
+      console.error('Erro ao avaliar prestador:', error)
+      throw new Error('Falha ao enviar avaliação')
+    }
   }
 }
 

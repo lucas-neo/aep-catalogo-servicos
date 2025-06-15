@@ -34,7 +34,7 @@ export function LoginForm({
       // Validar com o raul a rota
 
       await axios.post(
-        "/api/login",
+        "localhost:3001/api/login",
         {
           email,
           password,

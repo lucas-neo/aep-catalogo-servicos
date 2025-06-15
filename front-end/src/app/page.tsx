@@ -63,14 +63,15 @@ export default function HomePage() {
 
   // Funções para aplicar filtros
   const aplicarFiltroCategoria = useCallback((categoria: CategoriaPrestador | undefined) => {
-    setFiltros(prev => ({ ...prev, categoria }))
+    const novosFiltros = { ...filtros, categoria }
+    setFiltros(novosFiltros)
     // Recarregar dados do backend com filtro
-    carregarPrestadores({ ...filtros, categoria })
+    carregarPrestadores(novosFiltros)
   }, [filtros, carregarPrestadores])
 
   const aplicarFiltroPreco = useCallback((min?: number, max?: number) => {
     const novosFiltros = { ...filtros, precoMin: min, precoMax: max }
-    setFiltros(prev => ({ ...prev, precoMin: min, precoMax: max }))
+    setFiltros(novosFiltros)
     carregarPrestadores(novosFiltros)
   }, [filtros, carregarPrestadores])
 
@@ -293,36 +294,14 @@ export default function HomePage() {
               /* Prestadores Grid */
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                 {prestadoresFiltrados.map((prestador) => (
-                  <Card key={prestador.id} className="hover:shadow-md transition-shadow">
-                    <CardContent className="p-4">
-                      {/* Avatar */}
-                      <div className="flex justify-center mb-4">
-                        <Avatar className="h-16 w-16">
-                          <AvatarImage src={prestador.fotoPerfil || ''} />
-                          <AvatarFallback className="text-lg">
-                            {prestador.nome.split(' ').map(n => n[0]).join('')}
-                          </AvatarFallback>
-                        </Avatar>
-                      </div>
-
-                      {/* Informações */}
-                      <div className="text-center mb-4">
-                        <h3 className="font-semibold text-lg mb-1">
-                          {prestador.nome}
-                        </h3>
-                        <p className="text-blue-600 text-sm font-medium mb-2">
-                          {prestador.titulo}
-                        </p>
-
-                        {/* Categoria */}
-                        <span className="inline-block px-2 py-1 bg-gray-100 text-xs rounded-full mb-2">
-                          {categoriasDisplay[prestador.categoria]}
-                        </span>
-                        
-                        {/* Avaliação */}
-                        <div className="flex items-center justify-center gap-1 mb-2">
-                          <Star className="h-4 w-4 fill-yellow-400 text-yellow-400" />
-                          <span className="text-sm font-medium">
+                  <Link key={prestador.id} href={`/prestador/${prestador.id}`} className="block">
+                    <Card className="hover:shadow-lg hover:scale-105 transition-all duration-200 relative aspect-square overflow-hidden cursor-pointer">
+                      <CardContent className="p-4 h-full flex flex-col justify-center relative">
+                       
+                        {/* Avaliação - Canto Superior Direito */}
+                        <div className="absolute top-1 right-3 flex items-center gap-1 backdrop-blur-sm px-2 py-1 rounded-full shadow-md z-10">
+                          <Star className="h-3 w-3 fill-yellow-400 text-yellow-400" />
+                          <span className="text-xs font-semibold">
                             {prestador.avaliacaoMedia}
                           </span>
                           <span className="text-xs text-gray-500">
@@ -330,33 +309,50 @@ export default function HomePage() {
                           </span>
                         </div>
 
-                        {/* Localização */}
-                        <div className="flex items-center justify-center gap-1 mb-2">
-                          <MapPin className="h-3 w-3 text-gray-400" />
-                          <span className="text-xs text-gray-600">
-                            {prestador.cidade}, {prestador.estado}
-                          </span>
+                        {/* Conteúdo Principal - Centralizado */}
+                        <div className="flex flex-col items-center justify-center text-center space-y-2">
+                          {/* Avatar */}
+                          <Avatar className="h-20 w-20 shadow-lg ring-2 ring-white">
+                            <AvatarImage src={prestador.fotoPerfil || ''} />
+                            <AvatarFallback className="text-base font-semibold bg-blue-100 text-blue-700">
+                              {prestador.nome.split(' ').map(n => n[0]).join('')}
+                            </AvatarFallback>
+                          </Avatar>
+
+                          {/* Informações do Prestador */}
+                          <div className="space-y-1 w-full px-1">
+                            {/* Nome */}
+                            <h3 className="font-bold text-base text-gray-900 line-clamp-1">
+                              {prestador.nome}
+                            </h3>
+                            
+                            {/* Título */}
+                            <p className="text-blue-600 text-sm font-medium line-clamp-1">
+                              {prestador.titulo}
+                            </p>
+
+                            {/* Localização e Preço - Lado a Lado */}
+                            <div className="flex items-center justify-between w-full pt-1">
+                              {/* Localização - Lado Esquerdo */}
+                              <div className="flex items-center gap-1 ml-3">
+                                <MapPin className="h-3 w-3 text-gray-400 flex-shrink-0" />
+                                <span className="text-xs text-gray-600 line-clamp-1">
+                                  {prestador.cidade}, {prestador.estado}
+                                </span>
+                              </div>
+
+                              {/* Preço - Lado Direito */}
+                              <div className="text-right mr-3">
+                                <span className="text-xs font-bold text-green-700">
+                                  {prestador.precoHora ? `R$ ${prestador.precoHora}/h` : 'Consulta'}
+                                </span>
+                              </div>
+                            </div>
+                          </div>
                         </div>
-
-                        {/* Descrição */}
-                        <p className="text-xs text-gray-600 mb-3 line-clamp-2">
-                          {prestador.descricao}
-                        </p>
-
-                        {/* Preço */}
-                        <p className="text-lg font-bold text-green-600 mb-4">
-                          {prestador.precoHora ? `R$ ${prestador.precoHora}/hora` : 'Preço sob consulta'}
-                        </p>
-                      </div>
-
-                      {/* Botão */}
-                      <Link href={`/prestador/${prestador.id}`}>
-                        <Button className="w-full" variant="outline">
-                          Saiba Mais
-                        </Button>
-                      </Link>
-                    </CardContent>
-                  </Card>
+                      </CardContent>
+                    </Card>
+                  </Link>
                 ))}
               </div>
             )}

@@ -15,6 +15,7 @@ import { Label } from "@/components/ui/label";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Textarea } from "@/components/ui/textarea";
 import { Checkbox } from "@/components/ui/checkbox";
+import { FileUpload } from "@/components/ui/file-upload";
 import { useState } from "react";
 import axios from "axios";
 import { User, Briefcase } from "lucide-react";
@@ -48,6 +49,8 @@ export function RegisterForm({
   const [endereco, setEndereco] = useState("");
   const [raioAtendimento, setRaioAtendimento] = useState("");
   const [precoHora, setPrecoHora] = useState("");
+  const [fotoPerfil, setFotoPerfil] = useState("");
+  const [uploading, setUploading] = useState(false);
   
   // Estados da UI
   const [loading, setLoading] = useState(false);
@@ -147,6 +150,73 @@ export function RegisterForm({
     }
   }
 
+  // Upload de imagem
+  const handleImageUpload = async (event: React.ChangeEvent<HTMLInputElement>) => {
+    const file = event.target.files?.[0]
+    if (!file) return
+
+    // Validar tipo de arquivo
+    if (!file.type.startsWith('image/')) {
+      setError('Apenas imagens são permitidas')
+      return
+    }
+
+    // Validar tamanho (max 5MB)
+    if (file.size > 5 * 1024 * 1024) {
+      setError('Imagem deve ter no máximo 5MB')
+      return
+    }
+
+    setUploading(true)
+    setError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await axios.post('http://localhost:3001/api/files/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      if (response.data.url) {
+        setFotoPerfil(`http://localhost:3001${response.data.url}`)
+      }
+    } catch (error) {
+      console.error('Erro no upload:', error)
+      setError('Erro ao fazer upload da imagem')
+    } finally {
+      setUploading(false)
+    }
+  }
+
+  // Manipulador do FileUpload component
+  const handleFileSelect = async (file: File) => {
+    setUploading(true)
+    setError('')
+
+    try {
+      const formData = new FormData()
+      formData.append('file', file)
+
+      const response = await axios.post('http://localhost:3001/api/files/upload', formData, {
+        headers: {
+          'Content-Type': 'multipart/form-data',
+        },
+      })
+
+      if (response.data.fullUrl) {
+        setFotoPerfil(response.data.fullUrl)
+      }
+    } catch (error) {
+      console.error('Erro no upload:', error)
+      setError('Erro ao fazer upload da imagem')
+    } finally {
+      setUploading(false)
+    }
+  }
+
   // Handle mudança de subcategoria
   const handleSubcategoriaChange = (subcategoria: SubcategoriaPrestador, checked: boolean) => {
     if (checked) {
@@ -209,11 +279,12 @@ export function RegisterForm({
           endereco,
           raioAtendimento: parseInt(raioAtendimento) || 10,
           precoHora: precoHora ? parseFloat(precoHora) : undefined,
+          fotoPerfil,
         })
       }
 
       await axios.post(
-        "/api/register",
+        "http://localhost:3001/api/register",
         dadosRegistro,
         {
           withCredentials: true,
@@ -394,6 +465,19 @@ export function RegisterForm({
                         onChange={(e) => setTitulo(e.target.value)}
                       />
                     </div>
+
+                    {/* Upload de Foto de Perfil */}
+                    <div className="grid gap-3">
+                      <Label>Foto de Perfil</Label>
+                      <FileUpload
+                        onFileSelect={handleFileSelect}
+                        preview={fotoPerfil}
+                        loading={uploading}
+                        onRemove={() => setFotoPerfil("")}
+                        accept="image/*"
+                        maxSize={5}
+                      />
+                    </div>
                     
                     <div className="grid gap-3">
                       <Label htmlFor="categoria">Categoria Principal *</Label>
@@ -446,6 +530,38 @@ export function RegisterForm({
                         onChange={(e) => setDescricao(e.target.value)}
                         rows={3}
                       />
+                    </div>
+
+                    {/* Upload de Foto de Perfil */}
+                    <div className="grid gap-3">
+                      <Label htmlFor="fotoPerfil">Foto de Perfil</Label>
+                      <div className="flex items-center gap-4">
+                        {fotoPerfil && (
+                          <div className="w-16 h-16 rounded-full overflow-hidden bg-gray-100">
+                            <img 
+                              src={fotoPerfil} 
+                              alt="Preview" 
+                              className="w-full h-full object-cover"
+                            />
+                          </div>
+                        )}
+                        <div className="flex-1">
+                          <Input
+                            id="fotoPerfil"
+                            type="file"
+                            accept="image/*"
+                            onChange={handleImageUpload}
+                            disabled={uploading}
+                            className="cursor-pointer"
+                          />
+                          {uploading && (
+                            <p className="text-sm text-gray-500 mt-1">Fazendo upload...</p>
+                          )}
+                          <p className="text-xs text-gray-500 mt-1">
+                            Aceita PNG, JPG ou JPEG até 5MB
+                          </p>
+                        </div>
+                      </div>
                     </div>
                     
                     <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
