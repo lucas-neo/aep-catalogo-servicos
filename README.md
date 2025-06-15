@@ -335,254 +335,6 @@ CREATE TABLE AVALIACAO (
 4. Opcionalmente escreve comentário
 5. Avaliação é salva e média atualizada
 
-## 🎭 Casos de Uso
-
-### Diagrama Geral de Casos de Uso
-
-```mermaid
-graph TD
-    Cliente((Cliente))
-    Prestador((Prestador))
-    Sistema[Sistema AEP]
-    
-    %% Casos de Uso do Cliente
-    Cliente --> UC1[Buscar Prestadores]
-    Cliente --> UC2[Filtrar Prestadores]
-    Cliente --> UC3[Visualizar Perfil]
-    Cliente --> UC4[Avaliar Prestador]
-    Cliente --> UC5[Contatar Prestador]
-    
-    %% Casos de Uso do Prestador
-    Prestador --> UC6[Cadastrar-se]
-    Prestador --> UC7[Upload Foto Perfil]
-    Prestador --> UC8[Editar Perfil]
-    Prestador --> UC9[Gerenciar Disponibilidade]
-    
-    %% Casos de Uso do Sistema
-    Sistema --> UC10[Calcular Média Avaliações]
-    Sistema --> UC11[Armazenar Imagens]
-    Sistema --> UC12[Validar Dados]
-    
-    %% Relacionamentos
-    UC1 --> UC2
-    UC3 --> UC4
-    UC6 --> UC7
-    UC4 --> UC10
-    UC7 --> UC11
-```
-
-### Casos de Uso Detalhados
-
-#### UC1: Buscar Prestadores
-```mermaid
-sequenceDiagram
-    participant Cliente
-    participant Frontend
-    participant Backend
-    participant Database
-    
-    Cliente->>Frontend: Acessa página principal
-    Frontend->>Backend: GET /api/prestadores
-    Backend->>Database: SELECT * FROM prestadores
-    Database-->>Backend: Lista de prestadores
-    Backend-->>Frontend: JSON com prestadores
-    Frontend-->>Cliente: Exibe cards dos prestadores
-```
-
-#### UC2: Filtrar Prestadores
-```mermaid
-sequenceDiagram
-    participant Cliente
-    participant Frontend
-    participant Backend
-    participant Database
-    
-    Cliente->>Frontend: Seleciona filtros
-    Note over Cliente: Categoria, cidade, preço, etc.
-    Frontend->>Backend: GET /api/prestadores?filtros
-    Backend->>Database: SELECT com WHERE
-    Database-->>Backend: Prestadores filtrados
-    Backend-->>Frontend: JSON filtrado
-    Frontend-->>Cliente: Atualiza lista
-```
-
-#### UC3: Visualizar Perfil do Prestador
-```mermaid
-sequenceDiagram
-    participant Cliente
-    participant Frontend
-    participant Backend
-    participant Database
-    
-    Cliente->>Frontend: Clica em "Ver Perfil"
-    Frontend->>Backend: GET /api/prestadores/{id}
-    Backend->>Database: SELECT prestador + avaliações
-    Database-->>Backend: Dados completos
-    Backend-->>Frontend: JSON com perfil
-    Frontend-->>Cliente: Exibe página de perfil
-```
-
-#### UC4: Avaliar Prestador
-```mermaid
-sequenceDiagram
-    participant Cliente
-    participant Frontend
-    participant Backend
-    participant Database
-    
-    Cliente->>Frontend: Seleciona estrelas (1-5)
-    Cliente->>Frontend: Escreve comentário
-    Cliente->>Frontend: Clica "Avaliar"
-    Frontend->>Backend: POST /api/avaliacoes
-    Backend->>Database: INSERT avaliação
-    Backend->>Database: UPDATE média prestador
-    Database-->>Backend: Confirmação
-    Backend-->>Frontend: Sucesso + nova média
-    Frontend-->>Cliente: Toast de confirmação
-```
-
-#### UC5: Contatar Prestador
-```mermaid
-graph TD
-    A[Cliente visualiza prestador] --> B{Tipo de contato?}
-    B -->|WhatsApp| C[Abre WhatsApp]
-    B -->|Telefone| D[Abre discador]
-    B -->|Email| E[Abre cliente email]
-    
-    C --> F[Mensagem pré-formatada]
-    D --> G[Número do prestador]
-    E --> H[Email do prestador]
-```
-
-#### UC6: Cadastro de Prestador
-```mermaid
-sequenceDiagram
-    participant Prestador
-    participant Frontend
-    participant Backend
-    participant FileSystem
-    participant Database
-    
-    Prestador->>Frontend: Preenche formulário
-    Prestador->>Frontend: Seleciona foto
-    Frontend->>Backend: POST /api/files/upload
-    Backend->>FileSystem: Salva imagem
-    FileSystem-->>Backend: URL da imagem
-    Backend-->>Frontend: Retorna URL
-    Frontend->>Backend: POST /api/prestadores/register
-    Backend->>Database: INSERT prestador
-    Database-->>Backend: ID do prestador
-    Backend-->>Frontend: Confirmação
-    Frontend-->>Prestador: Redirecionamento
-```
-
-#### UC7: Upload de Foto de Perfil
-```mermaid
-graph TD
-    A[Prestador seleciona foto] --> B{Validação}
-    B -->|Formato inválido| C[Erro: Formato não suportado]
-    B -->|Tamanho > 10MB| D[Erro: Arquivo muito grande]
-    B -->|Válido| E[Upload para servidor]
-    
-    E --> F[Gerar UUID único]
-    F --> G[Salvar em /uploads/images/]
-    G --> H[Retornar URL pública]
-    H --> I[Atualizar preview]
-```
-
-### Fluxos de Exceção
-
-#### Erro de Validação
-```mermaid
-graph TD
-    A[Usuário envia dados] --> B{Validação}
-    B -->|Dados inválidos| C[Retorna erro 400]
-    B -->|Email já existe| D[Retorna erro de duplicação]
-    B -->|Campos obrigatórios| E[Lista campos faltantes]
-    
-    C --> F[Frontend exibe erro]
-    D --> F
-    E --> F
-    F --> G[Usuário corrige dados]
-    G --> A
-```
-
-#### Erro de Sistema
-```mermaid
-graph TD
-    A[Requisição do usuário] --> B{Sistema}
-    B -->|Banco indisponível| C[Erro 500]
-    B -->|Arquivo não encontrado| D[Erro 404]
-    B -->|Timeout| E[Erro 503]
-    
-    C --> F[Log do erro]
-    D --> F
-    E --> F
-    F --> G[Resposta ao usuário]
-    G --> H[Retry automático?]
-```
-
-### Regras de Negócio
-
-#### RN1: Avaliação de Prestadores
-- Nota deve ser entre 1 e 5
-- Comentário é opcional
-- Média é calculada automaticamente
-- Não há limite de avaliações por prestador
-
-```mermaid
-graph TD
-    A[Nova avaliação] --> B{Nota válida?}
-    B -->|Não| C[Erro: Nota inválida]
-    B -->|Sim| D[Salvar avaliação]
-    D --> E[Recalcular média]
-    E --> F[Atualizar contador]
-    F --> G[Notificar prestador]
-```
-
-#### RN2: Upload de Imagens
-- Formatos aceitos: JPG, PNG, GIF
-- Tamanho máximo: 10MB
-- Nome único com UUID
-- Armazenamento local
-
-```mermaid
-graph TD
-    A[Upload de imagem] --> B{Validações}
-    B -->|Formato| C{JPG/PNG/GIF?}
-    B -->|Tamanho| D{< 10MB?}
-    C -->|Não| E[Erro: Formato inválido]
-    C -->|Sim| D
-    D -->|Não| F[Erro: Arquivo muito grande]
-    D -->|Sim| G[Processar upload]
-    G --> H[Gerar UUID]
-    H --> I[Salvar arquivo]
-    I --> J[Retornar URL]
-```
-
-#### RN3: Filtros de Busca
-- Todos os filtros são opcionais
-- Filtros são combinados com AND
-- Busca por texto é case-insensitive
-- Ordenação por relevância
-
-```mermaid
-graph TD
-    A[Aplicar filtros] --> B{Categoria?}
-    B -->|Sim| C[WHERE categoria = ?]
-    B -->|Não| D{Cidade?}
-    C --> D
-    D -->|Sim| E[AND cidade = ?]
-    D -->|Não| F{Preço?}
-    E --> F
-    F -->|Sim| G[AND preco BETWEEN ? AND ?]
-    F -->|Não| H{Avaliação?}
-    G --> H
-    H -->|Sim| I[AND avaliacao_media >= ?]
-    H -->|Não| J[ORDER BY avaliacao_media DESC]
-    I --> J
-```
-
 ## 💡 Exemplos de Uso
 
 ### Frontend - Buscar Prestadores
@@ -974,6 +726,7 @@ sequenceDiagram
 ```
 
 ### 2. Busca e Filtros
+
 ```mermaid
 sequenceDiagram
     participant U as Usuário
@@ -997,6 +750,7 @@ sequenceDiagram
 ```
 
 ### 3. Sistema de Avaliação
+
 ```mermaid
 sequenceDiagram
     participant U as Usuário
@@ -1018,6 +772,7 @@ sequenceDiagram
 ```
 
 ### 4. Upload de Imagens
+
 ```mermaid
 sequenceDiagram
     participant U as Usuário
